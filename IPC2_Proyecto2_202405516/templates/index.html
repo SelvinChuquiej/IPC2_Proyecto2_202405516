@@ -1,88 +1,75 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8" />
     <title>GuateRiegos 2.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
-    <div class="container">
-        <div class="cardTitle">
+    <div class="container-fluid py-2" style="height: 100vh;">
+        <div class="d-flex align-items-center justify-content-center mb-4"
+            style="height: 80px; background-color: rgb(69, 48, 110); border-radius: 8px; color: white; width: 100%; height: 10%;">
             <h1>GuateRiegos 2.0</h1>
         </div>
-        <div class="cardArchivoXML">
-            <div class="cardArchivoXMLContent">
-                <div class="cardArchivoXMLTitle">
-                    <h2>Cargar configuración</h2>
-                </div>
-                <div class="info-text">
-                    <h3>Porfavor selecciona un archico con extension ".xml"</h3>
-                </div>
-                <div class="cardArchivoXMLBody">
-                    <form method="post" enctype="multipart/form-data" action="/cargar">
-                        <div class="file-input-group">
-                            <label for="archivo_xml" class="custom-file-input">
-                                <span id="file-text">Seleccionar archivo</span>
-                                <input id="archivo_xml" name="archivo_xml" type="file" accept=".xml" required hidden
-                                    onchange="document.getElementById('file-text').textContent = this.files[0]?.name || 'Seleccionar archivo'" />
-                            </label>
-                            <button type="submit">Cargar</button>
-                        </div>
-                    </form>
-                </div>
+        <div class="container-fluid card mb-4" style="width: 75%; height: 35%;">
+            <div class="card-body" style="display: grid; align-items: center;">
+                <h2 class="card-title">Cargar configuración</h2>
+                <p class="text-muted">Por favor selecciona un archivo con extensión ".xml"</p>
+                <form method="post" enctype="multipart/form-data" action="/cargar"
+                    class="d-flex align-items-center gap-3">
+                    <input id="archivo_xml" name="archivo_xml" type="file" accept=".xml" required class="form-control">
+                    <button type="submit" class="btn btn-success">Cargar</button>
+                </form>
             </div>
         </div>
-        <div class="cardSimulacion">
-            <div class="cardSimulacionContent">
-                <div class="cardSimulacionTitle">
-                    <h2>Simulación</h2>
-                </div>
-                <div class="info-textB">
+        <div class="container-fluid card mb-4" style="width: 75%; height: 35%;">
+            <div class="card-body" style="display: grid; align-items: center;">
+                <h2 class="card-title">Simulación</h2>
+                <div class="mb-3">
                     {% if archivo_actual %}
-                    <h3>Porfavor selecciona un invernadero y un plan para el archivo: <span>"{{ archivo_actual}}"</span></h3>
-                    <form method="post" action="/limpiar">
-                        <button type="submit">Limpiar</button>
-                    </form>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="mb-0">Por favor selecciona un invernadero y un plan para el archivo: <span class="fw-bold">"{{ archivo_actual }}"</span></p>
+                        <form method="post" action="/limpiar" class="mb-0" style="width: 10%;">
+                            <button type="submit" class="btn btn-danger btn-sm" style="width: 100%;">Limpiar</button>
+                        </form>
+                    </div>
                     {% else %}
-                    <h3>Porfavor selecciona un invernadero y un plan</h3>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="mb-0">Por favor selecciona un invernadero y un plan</p>
+                    </div>
                     {% endif %}
                 </div>
-
-                <div class="cardSimulacionBody">
-                    <form method="post" action="/simular">
-                        <div class="cardForm-group">
-                            <div class="form-group">
-                                <label for="inv">Invernadero</label>
-                                <select id="inv" name="inv" required>
-                                    {% if invernaderos %}
-                                        {% for inv in invernaderos %}
-                                            <option value="{{ inv }}">{{ inv }}</option>
-                                        {% endfor %}
-                                    {% endif %}
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="plan">Plan</label>
-                                <select id="plan" name="plan" required>
-                                    {% if planes %}
-                                        {% for plan in planes %}
-                                            <option value="{{ plan }}">{{ plan }}</option>
-                                        {% endfor %}
-                                    {% endif %}
-                                </select>
-                            </div>
-                            <div class="form-groupB">
-                                <button type="submit">Simular</button>
-                            </div>
+                <form method="post" action="/simular">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label for="inv" class="form-label">Invernadero</label>
+                            <select id="inv" name="inv" class="form-select" required>
+                                {% if invernaderos %}
+                                {% for inv in invernaderos %}
+                                <option value="{{ inv }}">{{ inv }}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
                         </div>
-                    </form>
-                </div>
+                        <div class="col-md-5">
+                            <label for="plan" class="form-label">Plan</label>
+                            <select id="plan" name="plan" class="form-select" required>
+                                {% if planes %}
+                                {% for plan in planes %}
+                                <option value="{{ plan }}">{{ plan }}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-grid">
+                            <button type="submit" class="btn btn-primary">Simular</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </body>
-
 </html>
