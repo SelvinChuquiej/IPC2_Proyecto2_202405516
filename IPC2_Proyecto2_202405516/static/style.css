@@ -1,0 +1,138 @@
+
+:root {
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    color-scheme: light dark;
+    background-color: white;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+.cardTitle {
+    background-color: rgb(69, 48, 110);
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    margin: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cardTitle h1 {
+    color: white;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.cardArchivoXML,
+.cardSimulacion,
+.cardReportes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 30px;
+}
+
+.cardArchivoXMLContent,
+.cardSimulacionContent,
+.cardReportesContent {
+    width: 80%;
+    box-shadow: 0px 0px 15px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background-color: white;
+
+}
+
+.cardArchivoXMLTitle,
+.cardSimulacionTitle,
+.cardReportesTitle {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-bottom: 1px solid #cfd2d5;
+    border-radius: 10px 10px 0 0;
+}
+
+.cardArchivoXMLTitle h2,
+.cardSimulacionTitle h2,
+.cardReportesTitle h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.cardArchivoXMLBody,
+.cardSimulacionBody {
+    padding: 30px;
+    color: black;
+    margin: 0 auto;
+}
+
+.cardReportesBody {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    height: 70px;
+}
+
+form {
+    display: flex;
+    gap: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: end;
+    gap: 6px;
+}
+
+.file-input-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.file-input-group>input {
+    width: 85%;
+}
+
+.file-input-group>button {
+    width: 15%;
+}
+
+.file-input-group>input[type="file"],
+input[type="number"],
+select {
+    border: 1.5px solid #cfd2d5;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 1rem;
+    background: #f8f9fa;
+    color: #2c3e50;
+    transition: border 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+.file-input-group>input[type="file"]{
+    padding: 6px 12px;
+}
+
+button {
+    background-color: rgb(69, 48, 110);;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 28px;
+    font-size: 1.08rem;
+    cursor: pointer;
+}
