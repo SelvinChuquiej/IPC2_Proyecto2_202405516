@@ -15,6 +15,7 @@ class Cola:
         else: 
             self.ultimo.siguiente = nuevo
             self.ultimo = nuevo
+        self.size += 1
 
     def desencolar(self):
         if self.primero is None:
