@@ -14,8 +14,20 @@
             <h1>GuateRiegos 2.0</h1>
         </div>
         <div class="cardTitle">
-            <h1>Reportes: </h1>
+            <h1>Reporte de simulacion</h1>
         </div>
+
+        <div class="cardReporte">
+            <div class="cardSimulacionTitle">
+                <h2>Estadísticas</h2>
+            </div>
+            <div class="info-textR">
+                <p>Invernadero: {{ invernadero.nombre }}</p>
+                <p>Plan: {{ plan.nombre }}</p>
+                <h3>Tiempo optimo: <span>{{ tiempo_optimo }}</span> | Litros totales: <span>{{ agua_total }}</span> | Gramos totales: <span>{{ fert_total }}</span></h3>
+            </div>
+        </div>
+
     </div>
 </body>
 

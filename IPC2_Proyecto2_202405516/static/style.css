@@ -45,6 +45,14 @@ body {
     margin-top: 30px;
 }
 
+.cardSimulacionReportes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+    margin-top: 30px;
+}
+
 .cardArchivoXMLContent,
 .cardSimulacionContent {
     box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.1);
@@ -66,6 +74,14 @@ body {
 .info-text {
     height: 20%;
     display: flex;
+    align-items: center;
+    justify-content: left;
+    padding: 0px 25px 0px;
+    border-bottom: 1px solid #cfd2d5;
+}
+
+.info-textR {
+    height: 20%;
     align-items: center;
     justify-content: left;
     padding: 0px 25px 0px;
