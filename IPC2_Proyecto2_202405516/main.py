@@ -7,6 +7,10 @@ app.secret_key = '202405516'
 app.register_blueprint(cargar_bp)
 
 @app.route('/')
+def root():
+    return redirect(url_for('index'))
+
+@app.route('/main')
 def index():
     data = getattr(current_app, 'DATA', {
         'invernaderos': None,
@@ -23,6 +27,10 @@ def limpiar():
     if hasattr(current_app, 'DATA'):
         del current_app.DATA
     return redirect(url_for('index'))
+
+@app.route('/simular', methods=['POST'])
+def simular():
+    return render_template('reportes.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
