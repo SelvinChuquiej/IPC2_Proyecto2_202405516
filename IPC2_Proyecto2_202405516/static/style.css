@@ -1,14 +1,9 @@
-
-:root {
+* {
     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-    color-scheme: light dark;
-    background-color: white;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    background-color: #f5f5f5;
+    background-color: white;
 }
 
 .cardTitle {
@@ -19,119 +14,217 @@ body {
     align-items: center;
     border-radius: 5px;
     margin: 5px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.1);
 }
 
-.cardTitle h1 {
+.cardTitle>h1 {
     color: white;
     font-size: 2rem;
     font-weight: 600;
+    width: 95%;
+    height: 100%;
+    display: flex;
+    align-items: center;
 }
 
-.cardArchivoXML,
-.cardSimulacion,
-.cardReportes {
+.cardArchivoXML {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 30px;
+    height: 250px;
+    margin-bottom: 30px;
+    margin-top: 30px;
+}
+
+.cardSimulacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    margin-bottom: 30px;
+    margin-top: 30px;
 }
 
 .cardArchivoXMLContent,
-.cardSimulacionContent,
-.cardReportesContent {
-    width: 80%;
-    box-shadow: 0px 0px 15px 10px rgba(0, 0, 0, 0.1);
+.cardSimulacionContent {
+    box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    background-color: white;
-
+    width: 80%;
+    height: 90%;
 }
 
 .cardArchivoXMLTitle,
-.cardSimulacionTitle,
-.cardReportesTitle {
-    background-color: #f8f9fa;
-    padding: 20px;
-    border-bottom: 1px solid #cfd2d5;
-    border-radius: 10px 10px 0 0;
-}
-
-.cardArchivoXMLTitle h2,
-.cardSimulacionTitle h2,
-.cardReportesTitle h2 {
-    color: #2c3e50;
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-.cardArchivoXMLBody,
-.cardSimulacionBody {
-    padding: 30px;
-    color: black;
-    margin: 0 auto;
-}
-
-.cardReportesBody {
+.cardSimulacionTitle {
+    height: 35%;
     display: flex;
-    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+    padding: 0px 25px 0px;
+    border-bottom: 1px solid #cfd2d5;
+}
+
+.info-text {
+    height: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    padding: 0px 25px 0px;
+    border-bottom: 1px solid #cfd2d5;
+}
+
+.info-textB {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    height: 20%;
+    padding: 0px 25px 0px;
+    border-bottom: 1px solid #cfd2d5;
+}
+
+.info-textB>form {
+    width: 20%;
+    display: flex;
     justify-content: center;
     align-items: center;
-    gap: 24px;
-    height: 70px;
+    height: 100%;
 }
 
-form {
+.info-textB>form>button {
+    width: 70%;
+    height: 80%;
+    background-color: rgb(69, 48, 110);
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.cardArchivoXMLTitle>h2,
+.cardSimulacionTitle>h2,
+.info-text>h2 {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.cardArchivoXMLTitle>h3,
+.cardSimulacionTitle>h3,
+.info-text>h3,
+.info-textB>h3 {
+    color: #2c3e50;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.cardArchivoXMLBody {
+    height: 45%;
+    width: 100%;
     display: flex;
-    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.cardSimulacionBody {
+    height: 40%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cardArchivoXMLBody>form {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.file-input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+    width: 100%;
+    gap: 25px;
+}
+
+.file-input-group>label {
+    width: 80%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    border: 1px solid #cfd2d5;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.file-input-group>label>span {
+    padding-left: 20px;
+    opacity: 0.7;
+}
+
+.file-input-group>button {
+    background-color: rgb(69, 48, 110);
+    color: white;
+    border-radius: 8px;
+    border: none;
+    width: 15%;
+    height: 50%;
+    cursor: pointer;
+}
+
+.cardSimulacionBody>form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.cardForm-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+    height: 80%;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    width: 100%;
     justify-content: end;
-    gap: 6px;
+    width: 40%;
+    height: 100%;
 }
 
-.file-input-group {
+.form-groupB {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    justify-content: end;
+    width: 10%;
+    height: 100%;
+}
+
+.form-group>label {
+    display: flex;
     align-items: center;
-    gap: 12px;
-    width: 100%;
+    height: 60%;
 }
 
-.file-input-group>input {
-    width: 85%;
-}
-
-.file-input-group>button {
-    width: 15%;
-}
-
-.file-input-group>input[type="file"],
-input[type="number"],
-select {
-    border: 1.5px solid #cfd2d5;
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 1rem;
-    background: #f8f9fa;
-    color: #2c3e50;
-    transition: border 0.2s, box-shadow 0.2s;
-    outline: none;
-}
-
-.file-input-group>input[type="file"]{
-    padding: 6px 12px;
-}
-
-button {
-    background-color: rgb(69, 48, 110);;
-    color: #fff;
-    border: none;
+.form-group>select {
+    height: 40%;
     border-radius: 8px;
-    padding: 12px 28px;
+}
+
+.form-groupB>button {
+    background-color: rgb(69, 48, 110);
+    color: white;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    height: 40%;
     cursor: pointer;
 }

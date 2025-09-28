@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8" />
     <title>GuateRiegos 2.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <div class="container">
         <div class="cardTitle">
@@ -16,10 +18,17 @@
                 <div class="cardArchivoXMLTitle">
                     <h2>Cargar configuración</h2>
                 </div>
+                <div class="info-text">
+                    <h3>Porfavor selecciona un archico con extension ".xml"</h3>
+                </div>
                 <div class="cardArchivoXMLBody">
                     <form method="post" enctype="multipart/form-data" action="/cargar">
                         <div class="file-input-group">
-                            <input name="archivo_xml" type="file" accept=".xml" required />
+                            <label for="archivo_xml" class="custom-file-input">
+                                <span id="file-text">Seleccionar archivo</span>
+                                <input id="archivo_xml" name="archivo_xml" type="file" accept=".xml" required hidden
+                                    onchange="document.getElementById('file-text').textContent = this.files[0]?.name || 'Seleccionar archivo'" />
+                            </label>
                             <button type="submit">Cargar</button>
                         </div>
                     </form>
@@ -31,50 +40,45 @@
                 <div class="cardSimulacionTitle">
                     <h2>Simulación</h2>
                 </div>
+                <div class="info-textB">
+                    {% if archivo_actual %}
+                        <h3>Porfavor selecciona un invernadero y un plan para el archivo: <span>"{{ archivo_actual }}"</span></h3>
+                        <form method="post" action="/limpiar">
+                            <button type="submit">Limpiar</button>
+                        </form>
+                    {% else %}
+                        <h3>Porfavor selecciona un invernadero y un plan</h3>
+                    {% endif %}
+                </div>
+
                 <div class="cardSimulacionBody">
                     <form method="post" action="/simular">
-                        <div class="form-group">
-                            <label for="inv">Invernadero</label>
-                            <select id="inv" name="inv" required>
-                                {% for inv in invernaderos %}
+                        <div class="cardForm-group">
+                            <div class="form-group">
+                                <label for="inv">Invernadero</label>
+                                <select id="inv" name="inv" required>
+                                    {% for inv in invernaderos %}
                                     <option value="{{ inv }}">{{ inv }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="plan">Plan</label>
-                            <select id="plan" name="plan" required>
-                                {% for plan in planes %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="plan">Plan</label>
+                                <select id="plan" name="plan" required>
+                                    {% for plan in planes %}
                                     <option value="{{ plan }}">{{ plan }}</option>
-                                {% endfor %}
-                            </select>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-groupB">
+                                <button type="submit">Simular</button>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="t">t (seg)</label>
-                            <input id="t" name="t" type="number" min="1" value="5" />
-                        </div>
-                        <div class="form-group">
-                            <button type="submit">Simular</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="cardReportes">
-            <div class="cardReportesContent">
-                <div class="cardReportesTitle">
-                    <h2>Reportes</h2>
-                </div>
-                <div class="cardReportesBody">
-                    <form>
-                        <button type="submit">Ver Reportes HTML</button>
-                    </form>
-                    <form>
-                        <button type="submit">Descargar salida.xml</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </body>
+
 </html>

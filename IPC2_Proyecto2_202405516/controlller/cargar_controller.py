@@ -38,7 +38,7 @@ def cargar_xml():
         data['planes'] = nombres_planes
         data['invernaderos_objetos'] = lista_invernaderos
         data['drones_objetos'] = lista_drones
-        
+        data['archivo_actual'] = archivo.filename  # Guardar nombre del archivo
         flash('Archivo cargado correctamente', 'success')
         return redirect(url_for('index'))
     
