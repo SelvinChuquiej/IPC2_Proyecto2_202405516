@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
-from controlller.xml_reader import leer_archivo
+from controller.xml_reader import leer_archivo
 from models.ListaEnlazada import ListaEnlazada
 import io
 

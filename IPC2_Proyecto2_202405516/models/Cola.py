@@ -41,3 +41,16 @@ class Cola:
         while actual:
             yield actual.dato
             actual = actual.siguiente
+
+    def ver_frente(self):
+        if self.primero:
+            return self.primero.dato
+        return None
+    
+    def tamanio(self):
+        contador = 0
+        actual = self.primero
+        while actual:
+            contador += 1
+            actual = actual.siguiente
+        return contador

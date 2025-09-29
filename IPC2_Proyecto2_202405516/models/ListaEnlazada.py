@@ -16,6 +16,7 @@ class ListaEnlazada:
             self.ultimo.siguiente = nuevo
             self.ultimo = nuevo
         self.size += 1
+        return nuevo 
 
     def buscar(self, dato):
         actual = self.primero
