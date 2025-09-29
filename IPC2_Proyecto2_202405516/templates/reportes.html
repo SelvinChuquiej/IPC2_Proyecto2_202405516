@@ -17,20 +17,61 @@
         </div>
         <div class="container-fluid card mb-4" style="width: 75%;">
             <div class="card-body">
+                <p class="card-text">Invernadero: {{ invernadero.nombre }}</p>
+                <p class="card-text">Plan: {{ plan.nombre }}</p>
                 <h2 class="card-title">Reporte de simulación</h2>
                 <div class="mb-3">
-                    <p class="mb-1"><strong>Invernadero:</strong> {{ invernadero.nombre }}</p>
-                    <p class="mb-3"><strong>Plan:</strong> {{ plan.nombre }}</p>
-                    <h5>
-                        Tiempo óptimo: <span class="badge bg-primary">{{ tiempo_optimo }}</span>
-                        &nbsp;|&nbsp;
-                        Litros totales: <span class="badge bg-success">{{ agua_total }}</span>
-                        &nbsp;|&nbsp;
-                        Gramos totales: <span class="badge bg-warning text-dark">{{ fert_total }}</span>
-                    </h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5>Tiempo Total</h5>
+                                    <span class="badge bg-primary fs-4">{{ tiempo_total }} segundos</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5>Agua Total</h5>
+                                    <span class="badge bg-success fs-4">{{ agua_total }} litros</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5>Fertilizante Total</h5>
+                                    <span class="badge bg-warning text-dark fs-4">{{ fertilizante_total }} gramos</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="mt-4">Detalle de acciones por segundo</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Tiempo</th>
+                            <th>DR01</th>
+                            <th>DR02</th>
+                            <th>DR03</th>
+                            <th>DR04</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ tabla_acciones | safe }}
+                    </tbody>
+                </table>
+                
+                <!-- Botón para volver -->
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('cargar.index') }}" class="btn btn-secondary">Volver al inicio</a>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </body>
 
