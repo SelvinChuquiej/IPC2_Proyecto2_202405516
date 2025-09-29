@@ -113,18 +113,19 @@ def calcular_consumos(plan, invernadero):
     # Posicionamiento inicial
     for i in range(num_hileras):
         _set_at(dron_pos, i, 1)
-    acciones_iniciales = [f"Adelante (H{i+1}P1)" for i in range(num_hileras)]
-    tabla_acciones = _append_fila(tabla_acciones, segundo, *acciones_iniciales)
 
-    # --- INTEGRACIÓN PARA EL SEGUNDO 1 ---
-    acciones_por_segundo = ListaEnlazada()
+    # Fila inicial y registro de acciones por segundo SIN usar list
+    fila = f"<tr><td>{segundo} segundo</td>"
     acciones_segundo = AccionesSegundo(segundo)
     for i in range(num_hileras):
-        nombre_dron = f"DR0{(i+1)}"
-        accion = acciones_iniciales[i]
-        acciones_segundo.acciones.insertar(AccionDron(nombre_dron, accion))
+        accion_txt = f"Adelante (H{i+1}P1)"
+        fila += f"<td>{accion_txt}</td>"
+        acciones_segundo.acciones.insertar(AccionDron(f"DR0{(i+1)}", accion_txt))
+    fila += "</tr>\n"
+    tabla_acciones += fila
+
+    acciones_por_segundo = ListaEnlazada()
     acciones_por_segundo.insertar(acciones_segundo)
-    # --------------------------------------
 
     def _instrucciones_restantes():
         c = 0
