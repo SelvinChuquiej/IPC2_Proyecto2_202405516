@@ -54,10 +54,9 @@
                     <thead>
                         <tr>
                             <th>Tiempo</th>
-                            <th>DR01</th>
-                            <th>DR02</th>
-                            <th>DR03</th>
-                            <th>DR04</th>
+                            {% for nombre_dron in nombres_drones %}
+                            <th>{{ nombre_dron }}</th>
+                            {% endfor %}
                         </tr>
                     </thead>
                     <tbody>
@@ -74,18 +73,16 @@
                                 <table class="table table-bordered mb-0">
                                     <thead>
                                         <tr>
-                                            <th>DR01</th>
-                                            <th>DR02</th>
-                                            <th>DR03</th>
-                                            <th>DR04</th>
+                                            {% for nombre_dron in nombres_drones %}
+                                            <th>{{ nombre_dron }}</th>
+                                            {% endfor %}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>{{ agua_por_dron[0] }}</td>
-                                            <td>{{ agua_por_dron[1] }}</td>
-                                            <td>{{ agua_por_dron[2] }}</td>
-                                            <td>{{ agua_por_dron[3] }}</td>
+                                            {% for i in range(agua_por_dron|length) %}
+                                            <td>{{ agua_por_dron[i] }}</td>
+                                            {% endfor %}
                                         </tr>
                                     </tbody>
                                 </table>
@@ -99,18 +96,16 @@
                                 <table class="table table-bordered mb-0">
                                     <thead>
                                         <tr>
-                                            <th>DR01</th>
-                                            <th>DR02</th>
-                                            <th>DR03</th>
-                                            <th>DR04</th>
+                                            {% for nombre_dron in nombres_drones %}
+                                            <th>{{ nombre_dron }}</th>
+                                            {% endfor %}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>{{ fertilizante_por_dron[0] }}</td>
-                                            <td>{{ fertilizante_por_dron[1] }}</td>
-                                            <td>{{ fertilizante_por_dron[2] }}</td>
-                                            <td>{{ fertilizante_por_dron[3] }}</td>
+                                            {% for i in range(fertilizante_por_dron|length) %}
+                                            <td>{{ fertilizante_por_dron[i] }}</td>
+                                            {% endfor %}
                                         </tr>
                                     </tbody>
                                 </table>
