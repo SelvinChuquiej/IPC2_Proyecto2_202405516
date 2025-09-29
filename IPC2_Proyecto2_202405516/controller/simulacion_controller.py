@@ -31,7 +31,7 @@ def simular():
         flash('No se encontró el invernadero o el plan seleccionado', 'danger')
         return redirect(url_for('cargar.index'))
     
-    tiempo_total, agua_total, fertilizante_total, tabla_acciones, agua_por_dron, fertilizante_por_dron = calcular_consumos(plan_obj, inv_obj)
+    tiempo_total, agua_total, fertilizante_total, tabla_acciones, agua_por_dron, fertilizante_por_dron, drones_asignados = calcular_consumos(plan_obj, inv_obj)
 
     # Convertir ListaEnlazada a lista de valores (solo para mostrar, no para lógica) 
     def lista_enlazada_a_lista(le):
@@ -41,6 +41,12 @@ def simular():
             valores.append(nodo.dato)
             nodo = nodo.siguiente
         return valores
+    
+    # Crear lista de nombres de drones para la plantilla
+    nombres_drones = ListaEnlazada()
+    for dron_tuple in drones_asignados:
+        dron, hilera_num = dron_tuple
+        nombres_drones.insertar(dron.nombre)
 
     return render_template(
         'reportes.html',
@@ -51,7 +57,8 @@ def simular():
         fertilizante_total=fertilizante_total,
         tabla_acciones=tabla_acciones,
         agua_por_dron=lista_enlazada_a_lista(agua_por_dron),
-        fertilizante_por_dron=lista_enlazada_a_lista(fertilizante_por_dron)
+        fertilizante_por_dron=lista_enlazada_a_lista(fertilizante_por_dron),
+        nombres_drones=lista_enlazada_a_lista(nombres_drones)
     )
 
 # Helpers de listas enlazadas (para evitar repetir código)
@@ -68,49 +75,90 @@ def _set_at(lista, idx, value):
     if n is not None:
         n.dato = value
 
-def _append_fila(tabla_acciones, segundo, acc1, acc2, acc3, acc4):
-    return (
-        tabla_acciones
-        + f"<tr><td>{segundo} segundo</td>"
-        + f"<td>{acc1}</td><td>{acc2}</td><td>{acc3}</td><td>{acc4}</td></tr>\n"
-    )
+def _append_fila(tabla_acciones, segundo, acciones_drones):
+    """
+    Agregar fila a la tabla de acciones con número dinámico de drones
+    acciones_drones: ListaEnlazada con las acciones de cada dron asignado
+    """
+    fila = f"<tr><td>{segundo} segundo</td>"
+    for accion in acciones_drones:
+        fila += f"<td>{accion}</td>"
+    fila += "</tr>\n"
+    return tabla_acciones + fila
+
+# Helpers para trabajar con drones asignados dinámicamente
+def _obtener_drones_asignados(invernadero):
+    """
+    Obtiene lista enlazada de drones asignados con sus hileras
+    Retorna: ListaEnlazada de tuplas (dron, hilera_numero)
+    """
+    drones_asignados = ListaEnlazada()
+    for hilera in invernadero.hileras:
+        if hilera.dron_asignado is not None:
+            drones_asignados.insertar((hilera.dron_asignado, hilera.numero))
+    return drones_asignados
+
+def _obtener_dron_por_hilera(drones_asignados, hilera_num):
+    """
+    Busca el dron asignado a una hilera específica
+    Retorna: tupla (dron, posicion_en_lista) o None si no se encuentra
+    """
+    posicion = 0
+    for dron_tuple in drones_asignados:
+        dron, hilera = dron_tuple
+        if hilera == hilera_num:
+            return (dron, posicion)
+        posicion += 1
+    return None
+
+def _obtener_posicion_dron_por_hilera(drones_asignados, hilera_num):
+    """
+    Obtiene la posición del dron en la lista de drones asignados basado en su hilera
+    """
+    posicion = 0
+    for dron_tuple in drones_asignados:
+        dron, hilera = dron_tuple
+        if hilera == hilera_num:
+            return posicion
+        posicion += 1
+    return -1
 
 # Búsquedas y reglas de negocio
-def _buscar_instruccion_dron(instrucciones_pendientes, instrucciones_completadas, dron_idx):
-    """Siguiente instrucción PENDIENTE (0) para este dron (hilera = dron_idx+1)."""
+def _buscar_instruccion_dron(instrucciones_pendientes, instrucciones_completadas, hilera_num, drones_asignados):
+    """Siguiente instrucción PENDIENTE (0) para esta hilera."""
     nodo_inst = instrucciones_pendientes.primero
     nodo_comp = instrucciones_completadas.primero
     while nodo_inst:
         partes = nodo_inst.dato.split('-')
         h = int(partes[0][1:])
         p = int(partes[1][1:])
-        if h == dron_idx + 1 and nodo_comp.dato == 0:
+        if h == hilera_num and nodo_comp.dato == 0:
             return (nodo_inst, p)
         nodo_inst = nodo_inst.siguiente
         nodo_comp = nodo_comp.siguiente
     return None
 
-def _tiene_instrucciones_pendientes(instrucciones_pendientes, instrucciones_completadas, dron_idx):
-    """¿Quedan instrucciones sin completar para la hilera = dron_idx+1?"""
+def _tiene_instrucciones_pendientes(instrucciones_pendientes, instrucciones_completadas, hilera_num):
+    """¿Quedan instrucciones sin completar para esta hilera?"""
     nodo_inst = instrucciones_pendientes.primero
     nodo_comp = instrucciones_completadas.primero
     while nodo_inst:
         partes = nodo_inst.dato.split('-')
         h = int(partes[0][1:])
-        if nodo_comp.dato == 0 and h == dron_idx + 1:
+        if nodo_comp.dato == 0 and h == hilera_num:
             return True
         nodo_inst = nodo_inst.siguiente
         nodo_comp = nodo_comp.siguiente
     return False
 
-def _actualizar_accion_dron(dron_idx, acciones, nueva_accion):
-    n = _get_at(acciones, dron_idx)
+def _actualizar_accion_dron(posicion_dron, acciones, nueva_accion):
+    n = _get_at(acciones, posicion_dron)
     if n is not None:
         n.dato = nueva_accion
 
-def _puede_regar(dron_idx, planta_objetivo, dron_pos, dron_movido):
-    pos = _get_at(dron_pos, dron_idx).dato
-    movio = _get_at(dron_movido, dron_idx).dato
+def _puede_regar(posicion_dron, planta_objetivo, dron_pos, dron_movido):
+    pos = _get_at(dron_pos, posicion_dron).dato
+    movio = _get_at(dron_movido, posicion_dron).dato
     return (pos == planta_objetivo) and (not movio)
 
 def buscar_planta(invernadero, hilera_num, planta_num):
@@ -123,6 +171,10 @@ def buscar_planta(invernadero, hilera_num, planta_num):
 
 # Simulación
 def calcular_consumos(plan, invernadero):
+    # Obtener drones asignados dinámicamente
+    drones_asignados = _obtener_drones_asignados(invernadero)
+    num_drones = len(drones_asignados)
+    
     # Totales generales
     tiempo_total = 0
     agua_total = 0
@@ -132,7 +184,7 @@ def calcular_consumos(plan, invernadero):
     agua_por_dron = ListaEnlazada()
     fertilizante_por_dron = ListaEnlazada()
 
-    for _ in range(4):
+    for _ in range(num_drones):
         agua_por_dron.insertar(0)
         fertilizante_por_dron.insertar(0)
 
@@ -148,7 +200,7 @@ def calcular_consumos(plan, invernadero):
     dron_fin = ListaEnlazada()             # True si ya no tiene pendientes
     instrucciones_completadas = ListaEnlazada()  # 0/1 por instrucción
 
-    for i in range(4):
+    for i in range(num_drones):
         dron_pos.insertar(0)
         dron_fin.insertar(False)
     for i in range(instrucciones_pendientes.size):
@@ -161,11 +213,15 @@ def calcular_consumos(plan, invernadero):
 
     # Segundo 1: posicionamiento a P1
     segundo += 1
-    _set_at(dron_pos, 0, 1)
-    _set_at(dron_pos, 1, 1)
-    _set_at(dron_pos, 2, 1)
-    _set_at(dron_pos, 3, 1)
-    tabla_acciones = _append_fila(tabla_acciones, segundo, "Adelante (H1P1)", "Adelante (H2P1)", "Adelante (H3P1)", "Adelante (H4P1)")
+    # Crear acciones iniciales dinámicamente
+    acciones_iniciales = ListaEnlazada()
+    posicion = 0
+    for dron_tuple in drones_asignados:
+        dron, hilera_num = dron_tuple
+        _set_at(dron_pos, posicion, 1)
+        acciones_iniciales.insertar(f"Adelante (H{hilera_num}P1)")
+        posicion += 1
+    tabla_acciones = _append_fila(tabla_acciones, segundo, acciones_iniciales)
 
     # Bucle principal
     def _instrucciones_restantes():
@@ -183,34 +239,39 @@ def calcular_consumos(plan, invernadero):
         # Estructuras del segundo
         dron_movido = ListaEnlazada()
         acciones = ListaEnlazada()
-        for i in range(4):
+        for i in range(num_drones):
             dron_movido.insertar(False)
             # Si ya terminó, no mostramos acción (queda celda vacía)
             fin = _get_at(dron_fin, i).dato
             acciones.insertar("" if fin else "Esperar")
 
         # FASE 1: Movimiento (máx 1 paso por dron, en orden del plan)
-        for dron_idx in range(4):
+        posicion = 0
+        for dron_tuple in drones_asignados:
+            dron, hilera_num = dron_tuple
             # si ya terminó, saltar
-            if _get_at(dron_fin, dron_idx).dato:
+            if _get_at(dron_fin, posicion).dato:
+                posicion += 1
                 continue
-            objetivo = _buscar_instruccion_dron(instrucciones_pendientes, instrucciones_completadas, dron_idx)
+            objetivo = _buscar_instruccion_dron(instrucciones_pendientes, instrucciones_completadas, hilera_num, drones_asignados)
             if not objetivo:
+                posicion += 1
                 continue
             _, planta_obj = objetivo
 
-            movio = _get_at(dron_movido, dron_idx)
-            pos = _get_at(dron_pos, dron_idx)
+            movio = _get_at(dron_movido, posicion)
+            pos = _get_at(dron_pos, posicion)
             if not movio.dato:
                 if pos.dato < planta_obj:
                     pos.dato += 1
-                    _actualizar_accion_dron(dron_idx, acciones, f"Adelante (H{dron_idx+1}P{pos.dato})")
+                    _actualizar_accion_dron(posicion, acciones, f"Adelante (H{hilera_num}P{pos.dato})")
                     movio.dato = True
                 elif pos.dato > planta_obj:
                     pos.dato -= 1
-                    _actualizar_accion_dron(dron_idx, acciones, f"Atras (H{dron_idx+1}P{pos.dato})")
+                    _actualizar_accion_dron(posicion, acciones, f"Atras (H{hilera_num}P{pos.dato})")
                     movio.dato = True
                 # si ya está en la planta, no se mueve (espera a fase de riego)
+            posicion += 1
 
         # FASE 2: Riego (máx 1 por segundo; en orden del plan)
         nodo_inst = instrucciones_pendientes.primero
@@ -222,52 +283,49 @@ def calcular_consumos(plan, invernadero):
                 h, p = nodo_inst.dato.split('-')
                 hilera_num = int(h[1:])
                 planta_num = int(p[1:])
-                dron_idx = hilera_num - 1
-
-                if 0 <= dron_idx < 4 and not _get_at(dron_fin, dron_idx).dato:
-                    if _puede_regar(dron_idx, planta_num, dron_pos, dron_movido):
+                
+                # Buscar la posición del dron para esta hilera
+                posicion_dron = _obtener_posicion_dron_por_hilera(drones_asignados, hilera_num)
+                if posicion_dron >= 0 and not _get_at(dron_fin, posicion_dron).dato:
+                    if _puede_regar(posicion_dron, planta_num, dron_pos, dron_movido):
                         # Sumar consumos
                         planta = buscar_planta(invernadero, hilera_num, planta_num)
                         if planta:
                             agua_total += planta.lt_agua
                             fertilizante_total += planta.gr_fertilizante
                             # Usar ListaEnlazada para sumar consumos por dron
-                            nodo_agua = _get_at(agua_por_dron, dron_idx)
-                            nodo_fert = _get_at(fertilizante_por_dron, dron_idx)
+                            nodo_agua = _get_at(agua_por_dron, posicion_dron)
+                            nodo_fert = _get_at(fertilizante_por_dron, posicion_dron)
                             if nodo_agua:
                                 nodo_agua.dato += planta.lt_agua
                             if nodo_fert:
                                 nodo_fert.dato += planta.gr_fertilizante
                         # Marcar instrucción
                         nodo_comp.dato = 1
-                        _actualizar_accion_dron(dron_idx, acciones, "Regar")
+                        _actualizar_accion_dron(posicion_dron, acciones, "Regar")
                         ultimo_riego = segundo
                         hubo_riego = True
             nodo_inst = nodo_inst.siguiente
             nodo_comp = nodo_comp.siguiente
 
         # FASE 3: Marcar FIN donde ya no hay pendientes (y acción quedó "Esperar")
-        for i in range(4):
-            fin = _get_at(dron_fin, i)
-            if not fin.dato and not _tiene_instrucciones_pendientes(instrucciones_pendientes, instrucciones_completadas, i):
-                acc = _get_at(acciones, i)
+        posicion = 0
+        for dron_tuple in drones_asignados:
+            dron, hilera_num = dron_tuple
+            fin = _get_at(dron_fin, posicion)
+            if not fin.dato and not _tiene_instrucciones_pendientes(instrucciones_pendientes, instrucciones_completadas, hilera_num):
+                acc = _get_at(acciones, posicion)
                 if acc.dato == "Esperar":
                     acc.dato = "FIN"
                     fin.dato = True
+            posicion += 1
 
         # Agregar fila
-        tabla_acciones = _append_fila(
-            tabla_acciones,
-            segundo,
-            _get_at(acciones, 0).dato,
-            _get_at(acciones, 1).dato,
-            _get_at(acciones, 2).dato,
-            _get_at(acciones, 3).dato
-        )
+        tabla_acciones = _append_fila(tabla_acciones, segundo, acciones)
 
         # Protección anti-infinito (por si el plan es imposible)
         if segundo > 100:
             break
 
     tiempo_total = ultimo_riego
-    return tiempo_total, agua_total, fertilizante_total, tabla_acciones, agua_por_dron, fertilizante_por_dron
+    return tiempo_total, agua_total, fertilizante_total, tabla_acciones, agua_por_dron, fertilizante_por_dron, drones_asignados
