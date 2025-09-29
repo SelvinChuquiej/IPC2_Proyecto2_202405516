@@ -64,7 +64,61 @@
                         {{ tabla_acciones | safe }}
                     </tbody>
                 </table>
-                
+
+                <h3 class="mt-4">Consumo por dron</h3>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>Litros de agua por dron</h5>
+                                <table class="table table-bordered mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>DR01</th>
+                                            <th>DR02</th>
+                                            <th>DR03</th>
+                                            <th>DR04</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{{ agua_por_dron[0] }}</td>
+                                            <td>{{ agua_por_dron[1] }}</td>
+                                            <td>{{ agua_por_dron[2] }}</td>
+                                            <td>{{ agua_por_dron[3] }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>Gramos de fertilizante por dron</h5>
+                                <table class="table table-bordered mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>DR01</th>
+                                            <th>DR02</th>
+                                            <th>DR03</th>
+                                            <th>DR04</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{{ fertilizante_por_dron[0] }}</td>
+                                            <td>{{ fertilizante_por_dron[1] }}</td>
+                                            <td>{{ fertilizante_por_dron[2] }}</td>
+                                            <td>{{ fertilizante_por_dron[3] }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Botón para volver -->
                 <div class="text-center mt-4">
                     <a href="{{ url_for('cargar.index') }}" class="btn btn-secondary">Volver al inicio</a>

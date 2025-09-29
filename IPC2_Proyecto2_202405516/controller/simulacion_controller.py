@@ -1,6 +1,5 @@
 from flask import Blueprint, request, redirect, url_for, flash, current_app, render_template
 from models.ListaEnlazada import ListaEnlazada
-from models.Nodo import Nodo
 
 simulacion_bp = Blueprint('simulacion', __name__)
 
@@ -20,7 +19,7 @@ def simular():
     # Buscar Invernadero
     inv_obj = None
     for inv in data.invernaderos_objetos:
-        if inv.nombre == nombre_invernadero:  inv_obj = inv; break
+        if inv.nombre == nombre_invernadero: inv_obj = inv; break
 
     # Buscar Plan
     plan_obj = None
@@ -31,33 +30,29 @@ def simular():
     if not inv_obj or not plan_obj:
         flash('No se encontró el invernadero o el plan seleccionado', 'danger')
         return redirect(url_for('cargar.index'))
+    
+    tiempo_total, agua_total, fertilizante_total, tabla_acciones, agua_por_dron, fertilizante_por_dron = calcular_consumos(plan_obj, inv_obj)
 
-    tiempo_total, agua_total, fertilizante_total, tabla_acciones = calcular_consumos(plan_obj, inv_obj)
+    # Convertir ListaEnlazada a lista de valores (solo para mostrar, no para lógica) 
+    def lista_enlazada_a_lista(le):
+        valores = []
+        nodo = le.primero
+        while nodo:
+            valores.append(nodo.dato)
+            nodo = nodo.siguiente
+        return valores
 
     return render_template(
-    'reportes.html',
-    invernadero=inv_obj,
-    plan=plan_obj,
-    tiempo_total=tiempo_total,
-    agua_total=agua_total,
-    fertilizante_total=fertilizante_total,
-    tabla_acciones=tabla_acciones
-)
-
-@simulacion_bp.route('/reporte_global', methods=['GET'])
-def reporte_global():
-    data = getattr(current_app, 'DATA', None)
-    if not data:
-        flash('No hay datos cargados para simular', 'danger')
-        return redirect(url_for('cargar.index'))
-
-    resultados = ListaEnlazada()
-    for inv in data.invernaderos_objetos:
-        for plan in inv.planes_riego:
-            tiempo, agua, fertilizante, tabla, agua_dron, ferti_dron = calcular_consumos(plan, inv)
-            resultados.insertar((inv, plan, tiempo, agua, fertilizante, tabla, agua_dron, ferti_dron))
-
-    return render_template('reporte_global.html', resultados=resultados)
+        'reportes.html',
+        invernadero=inv_obj,
+        plan=plan_obj,
+        tiempo_total=tiempo_total,
+        agua_total=agua_total,
+        fertilizante_total=fertilizante_total,
+        tabla_acciones=tabla_acciones,
+        agua_por_dron=lista_enlazada_a_lista(agua_por_dron),
+        fertilizante_por_dron=lista_enlazada_a_lista(fertilizante_por_dron)
+    )
 
 # Helpers de listas enlazadas (para evitar repetir código)
 def _get_at(lista, idx):
@@ -132,6 +127,14 @@ def calcular_consumos(plan, invernadero):
     tiempo_total = 0
     agua_total = 0
     fertilizante_total = 0
+    # Totales por dron usando ListaEnlazada
+
+    agua_por_dron = ListaEnlazada()
+    fertilizante_por_dron = ListaEnlazada()
+
+    for _ in range(4):
+        agua_por_dron.insertar(0)
+        fertilizante_por_dron.insertar(0)
 
     # Instrucciones pendientes (validadas)
     instrucciones_pendientes = ListaEnlazada()
@@ -162,7 +165,7 @@ def calcular_consumos(plan, invernadero):
     _set_at(dron_pos, 1, 1)
     _set_at(dron_pos, 2, 1)
     _set_at(dron_pos, 3, 1)
-    tabla_acciones = _append_fila(tabla_acciones, segundo,"Adelante (H1P1)", "Adelante (H2P1)", "Adelante (H3P1)", "Adelante (H4P1)")
+    tabla_acciones = _append_fila(tabla_acciones, segundo, "Adelante (H1P1)", "Adelante (H2P1)", "Adelante (H3P1)", "Adelante (H4P1)")
 
     # Bucle principal
     def _instrucciones_restantes():
@@ -228,7 +231,13 @@ def calcular_consumos(plan, invernadero):
                         if planta:
                             agua_total += planta.lt_agua
                             fertilizante_total += planta.gr_fertilizante
-                            
+                            # Usar ListaEnlazada para sumar consumos por dron
+                            nodo_agua = _get_at(agua_por_dron, dron_idx)
+                            nodo_fert = _get_at(fertilizante_por_dron, dron_idx)
+                            if nodo_agua:
+                                nodo_agua.dato += planta.lt_agua
+                            if nodo_fert:
+                                nodo_fert.dato += planta.gr_fertilizante
                         # Marcar instrucción
                         nodo_comp.dato = 1
                         _actualizar_accion_dron(dron_idx, acciones, "Regar")
@@ -247,11 +256,18 @@ def calcular_consumos(plan, invernadero):
                     fin.dato = True
 
         # Agregar fila
-        tabla_acciones = _append_fila( tabla_acciones, segundo,_get_at(acciones, 0).dato, _get_at(acciones, 1).dato,_get_at(acciones, 2).dato,_get_at(acciones, 3).dato)
+        tabla_acciones = _append_fila(
+            tabla_acciones,
+            segundo,
+            _get_at(acciones, 0).dato,
+            _get_at(acciones, 1).dato,
+            _get_at(acciones, 2).dato,
+            _get_at(acciones, 3).dato
+        )
 
         # Protección anti-infinito (por si el plan es imposible)
         if segundo > 100:
             break
 
     tiempo_total = ultimo_riego
-    return tiempo_total, agua_total, fertilizante_total, tabla_acciones
+    return tiempo_total, agua_total, fertilizante_total, tabla_acciones, agua_por_dron, fertilizante_por_dron
