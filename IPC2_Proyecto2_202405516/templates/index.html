@@ -31,13 +31,14 @@
                 <h2 class="card-title">Simulación</h2>
                 <div class="mb-3">
                     {% if archivo_actual %}
-                    <div class="d-flex justify-content-between align-items-center">
-                        <p class="mb-0">Por favor selecciona un invernadero y un plan para el archivo: <span
-                                class="fw-bold">"{{ archivo_actual }}"</span></p>
-                        <form method="post" action="/limpiar" class="mb-0" style="width: 10%;">
-                            <button type="submit" class="btn btn-danger btn-sm" style="width: 100%;">Limpiar</button>
-                        </form>
-                        <a href="{{ url_for('simulacion.reporte_completo') }}" class="btn btn-info btn-sm ms-2" style="width: 20%;">Ver Reporte Completo</a>
+                    <div class="d-flex align-items-center">
+                        <p class="mb-0" style="width: 60%">Por favor selecciona un invernadero y un plan para el archivo: <span class="fw-bold">"{{ archivo_actual }}"</span></p>
+                        <div class="d-flex align-items-center justify-content-end" style="width: 40%;">
+                            <form method="post" action="/limpiar" class="mb-0" style="width: 20%;">
+                                <button type="submit" class="btn btn-danger btn-sm" style="width: 100%;">Limpiar</button>
+                            </form>
+                            <a href="{{ url_for('simulacion.reporte_completo') }}" class="btn btn-info btn-sm ms-2" style="width: 50%;">Ver Reporte Completo</a>
+                        </div>
                     </div>
                     {% else %}
                     <div class="d-flex justify-content-between align-items-center">
@@ -78,7 +79,7 @@
         <div class="container-fluid card mb-4" style="width: 50%;">
             <div class="card-body">
                 <h2 class="card-title">Ayuda</h2>
-                <div class="card-body" >
+                <div class="card-body">
                     <div class="card card-body">
                         <h5>Información del estudiante</h5>
                         <ul>
@@ -87,14 +88,15 @@
                             <li><strong>Curso:</strong> IPC2</li>
                         </ul>
                         <h5>Documentación:</h5>
-                        <a href="https://github.com/tu_usuario/tu_repo/wiki" target="_blank" class="btn btn-info" style="width: 100%; margin: 0 auto;">
+                        <a href="https://github.com/tu_usuario/tu_repo/wiki" target="_blank" class="btn btn-info"
+                            style="width: 100%; margin: 0 auto;">
                             Ver documentación
                         </a>
                     </div>
                 </div>
             </div>
         </div>
-        
+
     </div>
 </body>
 
