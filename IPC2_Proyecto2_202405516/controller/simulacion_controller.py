@@ -1,5 +1,7 @@
 from flask import Blueprint, request, redirect, url_for, flash, current_app, render_template
 from models.ListaEnlazada import ListaEnlazada
+from models.Acciones import AccionDron, AccionesSegundo
+from .xml_writer import crear_salida_xml
 
 simulacion_bp = Blueprint('simulacion', __name__)
 
@@ -114,6 +116,16 @@ def calcular_consumos(plan, invernadero):
     acciones_iniciales = [f"Adelante (H{i+1}P1)" for i in range(num_hileras)]
     tabla_acciones = _append_fila(tabla_acciones, segundo, *acciones_iniciales)
 
+    # --- INTEGRACIÓN PARA EL SEGUNDO 1 ---
+    acciones_por_segundo = ListaEnlazada()
+    acciones_segundo = AccionesSegundo(segundo)
+    for i in range(num_hileras):
+        nombre_dron = f"DR0{(i+1)}"
+        accion = acciones_iniciales[i]
+        acciones_segundo.acciones.insertar(AccionDron(nombre_dron, accion))
+    acciones_por_segundo.insertar(acciones_segundo)
+    # --------------------------------------
+
     def _instrucciones_restantes():
         c = 0
         n = instrucciones_completadas.primero
@@ -200,11 +212,18 @@ def calcular_consumos(plan, invernadero):
             *[_get_at(acciones, i).dato for i in range(num_hileras)]
         )
 
+        acciones_segundo = AccionesSegundo(segundo)
+        for i in range(num_hileras):
+            accion = _get_at(acciones, i).dato
+            nombre_dron = f"DR0{(i+1)}"  # O usa el id real del dron si lo tienes
+            acciones_segundo.acciones.insertar(AccionDron(nombre_dron, accion))
+        acciones_por_segundo.insertar(acciones_segundo)
+
         if segundo > 100:
             break
 
     tiempo_total = ultimo_riego
-    return tiempo_total, agua_total, fertilizante_total, tabla_acciones, agua_por_dron, fertilizante_por_dron
+    return tiempo_total, agua_total, fertilizante_total, tabla_acciones, agua_por_dron, fertilizante_por_dron, acciones_por_segundo
 
 # --- Rutas Flask ---
 @simulacion_bp.route('/simular', methods=['POST'])
@@ -227,11 +246,12 @@ def simular():
         flash('No se encontró el invernadero o el plan seleccionado', 'danger')
         return redirect(url_for('cargar.index'))
     
-    tiempo_total, agua_total, fertilizante_total, tabla_acciones, agua_por_dron, fertilizante_por_dron = calcular_consumos(plan_obj, inv_obj)
+    tiempo_total, agua_total, fertilizante_total, tabla_acciones, agua_por_dron, fertilizante_por_dron, acciones_por_segundo = calcular_consumos(plan_obj, inv_obj)
 
     plan_obj.agua_por_dron = lista_enlazada_a_lista(agua_por_dron)
     plan_obj.fertilizante_por_dron = lista_enlazada_a_lista(fertilizante_por_dron)
-
+    plan_obj.acciones_por_segundo = acciones_por_segundo 
+    
     return render_template(
         'reportes.html',
         invernadero=inv_obj,
@@ -252,18 +272,29 @@ def reporte_completo():
     invernaderos = data.invernaderos_objetos
     for inv in invernaderos:
         for plan in inv.planes_riego:
-            tiempo_total, agua_total, fertilizante_total, tabla_acciones, agua_por_dron, fertilizante_por_dron = calcular_consumos(plan, inv)
-            plan.estadisticas = {
-                'tiempo_total': tiempo_total,
-                'agua_total': agua_total,
-                'fertilizante_total': fertilizante_total,
-                'recargas': 0 
-            }
+            tiempo_total, agua_total, fertilizante_total, tabla_acciones, agua_por_dron, fertilizante_por_dron, acciones_por_segundo = calcular_consumos(plan, inv)
+            plan.tiempo_total = tiempo_total
+            plan.agua_total = agua_total
+            plan.fertilizante_total = fertilizante_total
+            plan.recargas = 0
             plan.tabla_acciones = tabla_acciones
             plan.agua_por_dron = lista_enlazada_a_lista(agua_por_dron)
             plan.fertilizante_por_dron = lista_enlazada_a_lista(fertilizante_por_dron)
+            plan.acciones_por_segundo = acciones_por_segundo  # <--- ¡Agrega esto!
 
     return render_template(
         'reporte_completo.html',
         invernaderos=invernaderos
     )
+
+@simulacion_bp.route('/generar_xml_salida')
+def generar_xml_salida():
+    data = getattr(current_app, 'DATA', None)
+    if not data:
+        flash('No hay datos cargados para exportar', 'danger')
+        return redirect(url_for('cargar.index'))
+    # Llama a tu función para crear el XML
+    crear_salida_xml(data.invernaderos_objetos, "salida.xml")
+    # Puedes devolver el archivo para descarga directa:
+    from flask import send_file
+    return send_file("salida.xml", as_attachment=True)

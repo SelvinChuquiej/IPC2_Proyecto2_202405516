@@ -42,7 +42,8 @@
                         <div class="card bg-light">
                             <div class="card-body text-center">
                                 <h5>Total de plantas</h5>
-                                <span class="badge bg-warning text-dark fs-4">{{ invernadero.num_hileras * invernadero.plantas_x_hilera }}</span>
+                                <span class="badge bg-warning text-dark fs-4">{{ invernadero.num_hileras *
+                                    invernadero.plantas_x_hilera }}</span>
                             </div>
                         </div>
                     </div>
@@ -62,9 +63,9 @@
                             <td>H{{ hilera.numero }}</td>
                             <td>
                                 {% if hilera.dron_asignado %}
-                                    {{ hilera.dron_asignado.id }}
+                                {{ hilera.dron_asignado.id }}
                                 {% else %}
-                                    -
+                                -
                                 {% endif %}
                             </td>
                         </tr>
@@ -87,9 +88,9 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{{ plan.estadisticas.tiempo_total }} segundos</td>
-                                    <td>{{ plan.estadisticas.agua_total }} litros</td>
-                                    <td>{{ plan.estadisticas.fertilizante_total }} gramos</td>
+                                    <td>{{ plan.tiempo_total }} segundos</td>
+                                    <td>{{ plan.agua_total }} litros</td>
+                                    <td>{{ plan.fertilizante_total }} gramos</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -114,7 +115,7 @@
                                                     <td>{{ plan.agua_por_dron[loop.index0] }}</td>
                                                     {% endfor %}
                                                 </tr>
-                                            </tbody> 
+                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -145,7 +146,7 @@
                         </div>
 
                         <h5 class="mt-4">Detalle de acciones por segundo</h5>
-                        <table class="table table-bordered">
+                        <table class="table table-bordered text-center">
                             <thead>
                                 <tr>
                                     <th>Tiempo</th>
@@ -165,6 +166,10 @@
 
                 <div class="text-center mt-4">
                     <a href="{{ url_for('cargar.index') }}" class="btn btn-secondary">Volver al inicio</a>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('simulacion.generar_xml_salida') }}" class="btn btn-success">Generar XML
+                        salida</a>
                 </div>
             </div>
         </div>
