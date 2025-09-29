@@ -54,6 +54,3 @@ def crear_salida_xml(lista_invernaderos, ruta):
 
     tree = ET.ElementTree(root)
     tree.write(ruta, encoding="utf-8", xml_declaration=True)
-
-# Ejemplo de uso:
-# crear_salida_xml(invernaderos, "salida.xml")
