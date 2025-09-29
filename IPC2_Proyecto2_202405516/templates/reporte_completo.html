@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>GuateRiegos 2.0 - Reporte Completo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid py-2" style="height: 100vh;">
+        <div class="d-flex align-items-center justify-content-center mb-4"
+            style="height: 80px; background-color: rgb(69, 48, 110); border-radius: 8px; color: white; width: 100%; height: 10%;">
+            <h1>GuateRiegos 2.0</h1>
+        </div>
+        <div class="container-fluid card mb-4" style="width: 90%;">
+            <div class="card-body">
+                <h2 class="card-title">Reporte completo del sistema</h2>
+                {% for invernadero in invernaderos %}
+                <hr>
+                <h3 class="mt-4">Invernadero: {{ invernadero.nombre }}</h3>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>Hileras</h5>
+                                <span class="badge bg-primary fs-4">{{ invernadero.num_hileras }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>Plantas por hilera</h5>
+                                <span class="badge bg-success fs-4">{{ invernadero.plantas_x_hilera }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>Total de plantas</h5>
+                                <span class="badge bg-warning text-dark fs-4">{{ invernadero.num_hileras * invernadero.plantas_x_hilera }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="mt-4">Drones asignados</h4>
+                <table class="table table-bordered text-center" style="width: 80%; margin: 0 auto;">
+                    <thead>
+                        <tr>
+                            <th>Hilera</th>
+                            <th>Dron</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hilera in invernadero.hileras %}
+                        <tr>
+                            <td>H{{ hilera.numero }}</td>
+                            <td>
+                                {% if hilera.dron_asignado %}
+                                    {{ hilera.dron_asignado.id }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% for plan in invernadero.planes_riego %}
+                <div class="card mt-4 mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title">Plan de riego: {{ plan.nombre }}</h4>
+                        <h5 class="mt-4">Estadísticas del proceso</h5>
+                        <table class="table table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>Tiempo Total</th>
+                                    <th>Agua Total</th>
+                                    <th>Fertilizante Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ plan.estadisticas.tiempo_total }} segundos</td>
+                                    <td>{{ plan.estadisticas.agua_total }} litros</td>
+                                    <td>{{ plan.estadisticas.fertilizante_total }} gramos</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h5 class="mt-4">Consumo por dron</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6>Litros de agua por dron</h6>
+                                        <table class="table table-bordered mb-0">
+                                            <thead>
+                                                <tr>
+                                                    {% for drone in invernadero.drones %}
+                                                    <th>DR0{{ drone.id }}</th>
+                                                    {% endfor %}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    {% for drone in invernadero.drones %}
+                                                    <td>{{ plan.agua_por_dron[loop.index0] }}</td>
+                                                    {% endfor %}
+                                                </tr>
+                                            </tbody> 
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6>Gramos de fertilizante por dron</h6>
+                                        <table class="table table-bordered mb-0">
+                                            <thead>
+                                                <tr>
+                                                    {% for drone in invernadero.drones %}
+                                                    <th>DR0{{ drone.id }}</th>
+                                                    {% endfor %}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    {% for drone in invernadero.drones %}
+                                                    <td>{{ plan.fertilizante_por_dron[loop.index0] }}</td>
+                                                    {% endfor %}
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="mt-4">Detalle de acciones por segundo</h5>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Tiempo</th>
+                                    {% for drone in invernadero.drones %}
+                                    <th>DR0{{ drone.id }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{ plan.tabla_acciones | safe }}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endfor %}
+
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('cargar.index') }}" class="btn btn-secondary">Volver al inicio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

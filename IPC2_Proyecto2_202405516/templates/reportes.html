@@ -54,10 +54,9 @@
                     <thead>
                         <tr>
                             <th>Tiempo</th>
-                            <th>DR01</th>
-                            <th>DR02</th>
-                            <th>DR03</th>
-                            <th>DR04</th>
+                            {% for drone in invernadero.drones %}
+                            <th>DR0{{ drone.id }}</th>
+                            {% endfor %}
                         </tr>
                     </thead>
                     <tbody>
@@ -74,18 +73,17 @@
                                 <table class="table table-bordered mb-0">
                                     <thead>
                                         <tr>
-                                            <th>DR01</th>
-                                            <th>DR02</th>
-                                            <th>DR03</th>
-                                            <th>DR04</th>
+                                            {% for drone in invernadero.drones %}
+                                            <th>DR0{{ drone.id }}</th>
+                                            {% endfor %}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>{{ agua_por_dron[0] }}</td>
-                                            <td>{{ agua_por_dron[1] }}</td>
-                                            <td>{{ agua_por_dron[2] }}</td>
-                                            <td>{{ agua_por_dron[3] }}</td>
+                                            {% for drone in invernadero.drones %}
+                                            <!-- Litros de agua por dron -->
+                                            <td>{{ plan.agua_por_dron[loop.index0] }}</td>
+                                            {% endfor %}
                                         </tr>
                                     </tbody>
                                 </table>
@@ -99,18 +97,16 @@
                                 <table class="table table-bordered mb-0">
                                     <thead>
                                         <tr>
-                                            <th>DR01</th>
-                                            <th>DR02</th>
-                                            <th>DR03</th>
-                                            <th>DR04</th>
+                                            {% for drone in invernadero.drones %}
+                                            <th>DR0{{ drone.id }}</th>
+                                            {% endfor %}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>{{ fertilizante_por_dron[0] }}</td>
-                                            <td>{{ fertilizante_por_dron[1] }}</td>
-                                            <td>{{ fertilizante_por_dron[2] }}</td>
-                                            <td>{{ fertilizante_por_dron[3] }}</td>
+                                            {% for drone in invernadero.drones %}
+                                            <td>{{ plan.fertilizante_por_dron[loop.index0] }}</td>
+                                            {% endfor %}
                                         </tr>
                                     </tbody>
                                 </table>
@@ -118,6 +114,30 @@
                         </div>
                     </div>
                 </div>
+
+                <h3 class="mt-4">Asignación de drones</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Hilera</th>
+                            <th>Dron</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hilera in invernadero.hileras %}
+                        <tr>
+                            <td>H{{ hilera.numero }}</td>
+                            <td>
+                                {% if hilera.dron_asignado %}
+                                    DR0{{ hilera.dron_asignado.id }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
 
                 <!-- Botón para volver -->
                 <div class="text-center mt-4">
